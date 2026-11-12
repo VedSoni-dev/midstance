@@ -1,5 +1,5 @@
-import { Stage } from "@/components/Stage";
+import { Landing } from "@/components/Landing";
 
 export default function Home() {
-  return <Stage />;
+  return <Landing />;
 }

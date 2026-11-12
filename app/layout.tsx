@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Newsreader, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { PublikGate } from "@/components/PublikGate";
 
 const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", axes: ["opsz"] });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -24,9 +23,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
-      <body>
-        <PublikGate appName="Midstance">{children}</PublikGate>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

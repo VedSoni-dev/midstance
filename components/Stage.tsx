@@ -29,10 +29,10 @@ export function Stage() {
     <div className="stage">
       <Backdrop />
       <header className="topbar">
-        <span className="brand">
+        <a className="brand" href="/" aria-label="Midstance home">
           <Mark />
           Midstance
-        </span>
+        </a>
         <span className="session">
           <span className="live" aria-hidden />
           Session 0412 · sample data

@@ -50,7 +50,8 @@ function readoutText(r: Readings) {
   return { full: line, shown: line.slice(0, Math.max(0, shown)), typing: shown < line.length };
 }
 
-export function DiagnosticsPanel({ onOpen }: { onOpen: () => void }) {
+export function DiagnosticsPanel({ onOpen, titleAs = "h1" }: { onOpen: () => void; titleAs?: "h1" | "h2" }) {
+  const Title = titleAs;
   const r = useReadings(15);
   const ro = useMemo(() => readoutText(r), [r]);
 
@@ -60,11 +61,11 @@ export function DiagnosticsPanel({ onOpen }: { onOpen: () => void }) {
         <span className="dot-ring" aria-hidden />
         Post-Session Diagnostics
       </p>
-      <h1 id="diag-title" className="diag-title">
+      <Title id="diag-title" className="diag-title">
         Structural Kinetic
         <br />
         Assessment.
-      </h1>
+      </Title>
       <Texture />
       <div className="diag-row">
         <p className="diag-readout" aria-live="off" title={ro.full}>

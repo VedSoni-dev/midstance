@@ -60,7 +60,7 @@ async function postChoice(choice: Choice | null): Promise<void> {
 }
 let openedThisPage = false; // app_opened once per page load (React runs effects twice in development)
 
-export function PublikGate({ appName, children }: { appName?: string; children: ReactNode }) {
+export function PublikGate({ appName, footer, children }: { appName?: string; footer?: ReactNode; children: ReactNode }) {
   const [status, setStatus] = useState<GateStatus | null>(null);
   const [down, setDown] = useState(false);
   const [busy, setBusy] = useState(true);
@@ -203,6 +203,7 @@ export function PublikGate({ appName, children }: { appName?: string; children: 
           </div>
         )}
         <noscript><p className="pk-note">Turn on JavaScript to sign in with publik.</p></noscript>
+        {footer && <div className="pk-foot">{footer}</div>}
       </div>
     </main>
   );
@@ -246,6 +247,8 @@ const CSS = `
 .pk-body{margin:0;font-size:15px;line-height:1.55}
 .pk-note{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:14px;line-height:1.45;color:var(--pk-muted)}
 .pk-buttons{display:flex;flex-direction:column;gap:8px;margin-top:24px}
+.pk-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--pk-line);font-size:13px;line-height:1.5;color:var(--pk-muted)}
+.pk-foot a{color:var(--pk-ink);font-weight:600}
 .pk-btn{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:46px;padding:10px 16px;border:1px solid transparent;border-radius:12px;font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;transition:opacity .15s,background-color .15s}
 .pk-btn:disabled{opacity:.55;cursor:default}
 .pk-btn:focus-visible,.pk-seg button:focus-visible,.pk-link:focus-visible{outline:2px solid var(--pk-accent);outline-offset:2px}
