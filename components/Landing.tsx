@@ -16,18 +16,23 @@ const FILM = "https://vedsoni-dev.github.io/midstance/";
 const FEATURES: [string, string, string][] = [
   [
     "01",
-    "A live halftone heatmap",
-    "A mirrored load map in four blues, computed every frame on a pixel grid. The two lobes swell on each foot contact, in step with the runner. Hover it to read the load in kPa.",
+    "Your numbers in",
+    "Load split, cadence, stride length, contact time, knee and hip angles, pelvic drop: from a gait lab, a running watch or a coach. Start from a preset or type your own. Sessions save in your browser and export as JSON.",
   ],
   [
     "02",
-    "A runner drawn in code",
-    "No photo, no video: a gait cycle written from biomechanics, real motion blur, and a dashed motion-capture skeleton with glowing markers. Hover a joint for its angle; click to freeze the frame.",
+    "A live halftone load map",
+    "A mirrored map in four blues, computed every frame on a pixel grid. Each lobe grows with that foot's share of the load and pulses on contact for as long as your contact time. Hover it to read the load.",
   ],
   [
     "03",
-    "A protocol that opens",
-    "View Protocol builds a gait readout from the session: left and right symmetry, findings and a three-phase corrective plan. Copy it, download it or print it.",
+    "A runner on your angles",
+    "No photo, no video: a gait cycle drawn in code from your knee fold, hip swing, bounce and cadence, with real motion blur and a dashed motion-capture skeleton. Hover a joint for its angle.",
+  ],
+  [
+    "04",
+    "A protocol from your data",
+    "View Protocol turns your numbers into findings, left/right symmetry and a three-phase plan aimed at the side they point to. Copy it, download it or print it, then retest in two weeks.",
   ],
 ];
 
@@ -66,9 +71,9 @@ export function Landing() {
               alive.
             </h1>
             <p className="lp-lede">
-              Midstance is a working, open-source rebuild of a fitness &amp; healthcare dashboard designed by Praveen Kumar. The
-              load heatmap is generated live, the runner is drawn in code with a motion-capture skeleton tracking it, and the
-              protocol opens for real.
+              Midstance is an open-source rebuild of a fitness &amp; healthcare dashboard designed by Praveen Kumar, made into a
+              gait-assessment workspace. Enter your running numbers and the halftone load map, the motion-capture runner and your
+              protocol all redraw from them.
             </p>
             <div className="lp-actions">
               <a className="lp-btn" href="/app">
@@ -95,6 +100,7 @@ export function Landing() {
               <DiagnosticsPanel titleAs="h2" onOpen={() => window.location.assign("/app")} />
               <TelemetryPanel />
             </SessionScope>
+            <p className="lp-caption">Live, on a sample session. In the app it runs on yours.</p>
           </div>
         </section>
 
@@ -134,8 +140,8 @@ export function Landing() {
             The visual design is Praveen Kumar&rsquo;s, posted as a branding reel for a fitness &amp; healthcare brand. Someone
             asked &ldquo;can u make this?&rdquo;, so @forkthis_ai built it as real, working code. &ldquo;Midstance&rdquo; is a
             placeholder brand: the client&rsquo;s name and logos are not used, no images from the original post are used, and every
-            visual here is generated in code (canvas, SVG and CSS). The numbers are a sample session, not a measurement, and the
-            protocol is not medical advice.
+            visual here is generated in code (canvas, SVG and CSS). Midstance visualises the numbers you enter; it is not a
+            medical device, and the protocol is not medical advice.
           </p>
           <p className="lp-links">
             <a href="/app">Open the app</a>

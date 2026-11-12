@@ -1313,9 +1313,24 @@ a {
 }
 
 .lp-stage {
+  position: relative;
   display: flex;
   gap: var(--gap);
   align-items: center;
+  padding-bottom: 26px;
+}
+
+.lp-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
 }
 
 .lp-stage .diag {
@@ -1351,7 +1366,7 @@ a {
   margin: 0 0 64px;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);

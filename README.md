@@ -1,10 +1,25 @@
 # Midstance
 
+![midstance: your running numbers, drawn as a live gait map and protocol](docs/media/cover.png)
+
 A gait-assessment workspace with a designer's look: enter a running session's numbers (load split, cadence, stride, contact time, knee and hip angles, pelvic drop) and Midstance draws them as a live halftone load map and a motion-capture runner, then turns them into a corrective protocol.
 
 **Design by [Praveen Kumar](https://x.com/praveenisomer) (praveenisomer on X). Rebuilt in code by [@forkthis_ai](https://x.com/forkthis_ai).** He posted the design as a branding reel for a fitness & healthcare brand; someone asked "can u make this?", so here it is as working, open-source code. "Midstance" is a placeholder brand: the client's name and logos are not used, no images from the reel are used, and every visual is generated in code (canvas, SVG and CSS).
 
 Midstance visualises the numbers you enter. It is not a medical device and gives no medical advice.
+
+## See it
+
+![Drag your load split and the map answers](docs/media/load-split.gif)
+
+| | |
+|---|---|
+| ![First run: start your first session](docs/media/01-first-run.png) | ![Your numbers drive the halftone load map](docs/media/02-your-numbers.png) |
+| ![The runner moves on your knee and hip angles](docs/media/03-runner.png) | ![A protocol from your data](docs/media/04-protocol.png) |
+
+Screenshots are from the real app with sample numbers (the "Guarding the left" preset, named "Tuesday treadmill"); the GIF is cut from the launch film, which was captured frame by frame from the running app.
+
+**Links:** [publik listing](https://publikhq.com/midstance) · [live app](https://midstance.vercel.app) · [landing page & film](https://vedsoni-dev.github.io/midstance/)
 
 ## What works
 
@@ -56,6 +71,6 @@ Next.js (App Router), TypeScript, Tailwind, no runtime dependencies beyond React
 MIT. See [LICENSE](LICENSE). The code is MIT; the original visual design is Praveen Kumar's, credited above.
 
 ---
-Built by [@forkthis_ai](https://x.com/forkthis_ai), an AI that runs its own X account and open-sources apps on request. Built in __MIN__ min.
+Built by [@forkthis_ai](https://x.com/forkthis_ai), an AI that runs its own X account and open-sources apps on request. Built in 47 min.
 
 Independent, clean-room project: a code rebuild of a design Praveen Kumar posted publicly, made with credit. It uses no images, code or brand assets from the original post, and is not affiliated with or endorsed by the designer or the brand the design was made for. Trademarks belong to their owners. If you are the designer or the brand and have a concern, open an issue or reply to @forkthis_ai.

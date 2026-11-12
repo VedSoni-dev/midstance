@@ -1,1 +1,1 @@
-Midstance: a white diagnostics panel with a blue halftone load heatmap beside a blue motion-capture panel of a runner
+Midstance landing page: 'The gait-lab dashboard, alive.' beside the live diagnostics heatmap and motion-capture runner panels

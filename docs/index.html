@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>midstance: your running numbers, drawn as a live gait map</title>
+<meta name="description" content="A gait-assessment workspace with a designer's look: enter your running numbers and get a live halftone load map, a motion-capture runner and a corrective protocol. Free and open source.">
+<meta property="og:title" content="midstance: your running numbers, drawn as a live gait map">
+<meta property="og:description" content="Praveen Kumar's fitness & healthcare dashboard design, rebuilt by an AI as a working, open-source tool. Free on publik.">
+<meta property="og:image" content="https://vedsoni-dev.github.io/midstance/poster.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vedsoni-dev.github.io/midstance/poster.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0b0a09; --ink:#f4f2ee; --mute:#9a958c; --line:#26231f; --card:#14120f; --accent:#5aa2ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:400 17px/1.55 Inter, system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:inherit; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 20px; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:22px 0; }
+  .brand { font:800 22px/1 "Inter Tight", sans-serif; letter-spacing:-.02em; text-decoration:none; }
+  .by { display:flex; align-items:center; gap:8px; color:var(--mute); font-size:14px; text-decoration:none; }
+  .by img { width:22px; height:22px; border-radius:50%; background:#000; }
+  h1 { font:800 clamp(44px,7.5vw,88px)/.98 "Inter Tight", sans-serif; letter-spacing:-.045em; margin:56px 0 18px; }
+  h1 em { font-style:normal; color:var(--accent); }
+  .lede { font-size:clamp(18px,2.2vw,21px); color:var(--mute); max-width:680px; margin:0 0 30px; }
+  .lede a { color:var(--ink); }
+  .ctas { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:44px; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:13px 20px; border-radius:999px; font:600 16px/1 Inter, sans-serif; text-decoration:none; border:1px solid var(--line); }
+  .btn.primary { background:var(--accent); color:#0b0a09; border-color:var(--accent); }
+  .btn:hover { filter:brightness(1.08); }
+  .film { border-radius:18px; overflow:hidden; border:1px solid var(--line); background:#000; aspect-ratio:16/9; }
+  .film video { width:100%; height:100%; display:block; }
+  .receipts { display:flex; flex-wrap:wrap; gap:36px; margin:40px 0 8px; }
+  .receipts b { display:block; font:800 44px/1 "Inter Tight", sans-serif; letter-spacing:-.03em; }
+  .receipts span { color:var(--mute); font-size:14px; }
+  section { padding:44px 0; border-top:1px solid var(--line); margin-top:44px; }
+  h2 { font:700 28px/1.1 "Inter Tight", sans-serif; letter-spacing:-.02em; margin:0 0 18px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; }
+  .card b { display:block; font:600 17px/1.3 Inter, sans-serif; margin-bottom:4px; }
+  .card p { margin:0; color:var(--mute); font-size:15px; }
+  ul.gaps { margin:0; padding-left:18px; color:var(--mute); }
+  .pitch { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; color:var(--mute); }
+  .pitch a { color:var(--accent); font-weight:600; text-decoration:none; }
+  code { background:var(--card); border:1px solid var(--line); border-radius:6px; padding:2px 6px; font-size:14px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; overflow:auto; font-size:14px; }
+  footer { color:var(--mute); font-size:14px; padding:40px 0 60px; border-top:1px solid var(--line); margin-top:44px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="./">midstance</a>
+    <a class="by" href="https://x.com/forkthis_ai"><img src="forkthis.svg" alt="">built by @forkthis_ai</a>
+  </header>
+
+  <h1>your running numbers,<br>as a <em>live gait map.</em></h1>
+  <p class="lede">A designer posted a fitness &amp; healthcare dashboard; someone asked "can u make this?". So it's real code now: enter your load split, cadence, stride, contact time, knee and hip angles, and Midstance draws them as a halftone load map and a motion-capture runner, then writes your corrective protocol. Design by <a href="https://x.com/praveenisomer">Praveen Kumar</a> (praveenisomer on X).</p>
+  <div class="ctas">
+    <a class="btn primary" href="https://publikhq.com/midstance">Get it on publik</a>
+    <a class="btn" href="https://midstance.vercel.app">Try it live</a>
+    <a class="btn" href="https://github.com/VedSoni-dev/midstance">View on GitHub</a>
+  </div>
+
+  <div class="film"><video src="midstance.mp4" poster="poster.png" controls playsinline muted autoplay loop preload="metadata"></video></div>
+
+  <div class="receipts">
+    <div><b>47</b><span>minutes to build</span></div>
+    <div><b>4,622</b><span>lines of code</span></div>
+    <div><b>0</b><span>photos (every visual is code)</span></div>
+    <div><b>MIT</b><span>open source</span></div>
+  </div>
+
+  <section>
+    <h2>What works</h2>
+    <div class="grid">
+      <div class="card"><b>Your own sessions</b><p>A first-run how-to, four presets as starting points, then your numbers. Saved in your browser; export and import as JSON.</p></div>
+      <div class="card"><b>A live halftone load map</b><p>Each lobe grows with that foot's share of the load and pulses on contact. Hover to read it.</p></div>
+      <div class="card"><b>A runner on your angles</b><p>Drawn in code: knee fold, hip swing, bounce and cadence from your session, real motion blur, a motion-capture skeleton.</p></div>
+      <div class="card"><b>A protocol from your data</b><p>Findings, left/right symmetry and a three-phase plan aimed at the side your numbers point to. Copy, download, print.</p></div>
+      <div class="card"><b>The designer's look</b><p>Transitional serif, halftone textures, the black View Protocol button, drifting dot blobs: faithful to the reel.</p></div>
+      <div class="card"><b>Phones and reduced motion</b><p>Stacks on phones; a single still frame when motion is reduced.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Not yet</h2>
+    <ul class="gaps">
+      <li>No sensors or video: you type the numbers in from a gait lab, a watch or a coach.</li>
+      <li>The protocol is rules of thumb from your numbers, not a clinician. Midstance is not a medical device.</li>
+      <li>No cloud sync or session comparison view yet (duplicate a session to compare).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Free, because of publik</h2>
+    <p class="pitch">Midstance is free on publik, a free software marketplace. When you use it through publik, its builder earns a small share of the usage, which keeps Midstance free. publik's mission: free software for everyone. <a href="https://publikhq.com">Make a free publik account →</a></p>
+  </section>
+
+  <section>
+    <h2>Run it yourself</h2>
+    <pre>git clone https://github.com/VedSoni-dev/midstance
+cd midstance && npm install && npm run dev</pre>
+    <p style="color:var(--mute)">The landing page is at <code>/</code>; the workspace at <code>/app</code> opens with Sign in with <a href="https://publikhq.com/midstance">publik</a>.</p>
+  </section>
+
+  <footer>
+    The visual design is Praveen Kumar's (praveenisomer on X), credited with thanks; "midstance" is a placeholder brand, and no images or brand assets from the original post are used. Not affiliated with the designer or the brand the design was made for.
+    Built start to finish by <a href="https://x.com/forkthis_ai">@forkthis_ai</a>, an AI that open-sources software. Tag it under any launch.
+  </footer>
+</div>
+</body>
+</html>
