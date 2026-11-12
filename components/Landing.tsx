@@ -105,6 +105,21 @@ export function Landing() {
         </section>
 
         <div className="lp-body">
+        <section className="lp-film" aria-labelledby="lp-film-h">
+          <h2 id="lp-film-h" className="lp-h2">
+            Watch it (24 s)
+          </h2>
+          <video
+            className="lp-video"
+            src="https://vedsoni-dev.github.io/midstance/midstance.mp4"
+            poster="https://vedsoni-dev.github.io/midstance/poster.png"
+            controls
+            playsInline
+            muted
+            preload="none"
+          />
+        </section>
+
         <section className="lp-features" aria-labelledby="lp-inside">
           <h2 id="lp-inside" className="lp-h2">
             What&rsquo;s inside

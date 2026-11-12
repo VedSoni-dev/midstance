@@ -1345,6 +1345,20 @@ a {
   padding-top: 64px;
 }
 
+.lp-film {
+  max-width: 1120px;
+  margin: 0 auto 64px;
+  padding: 0 clamp(16px, 4vw, 56px);
+}
+
+.lp-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #050506;
+  border: 1px solid var(--line);
+}
+
 .lp-features,
 .lp-publik,
 .lp-about {
