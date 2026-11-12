@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Newsreader, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { PublikGate } from "@/components/PublikGate";
 
 const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", axes: ["opsz"] });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://midstance.vercel.app"),
   title: "Midstance: a gait-lab dashboard, rebuilt in code",
   description:
     "A designer's fitness & healthcare UI rebuilt as a live, open-source frontend: a halftone load heatmap, a motion-capture runner and a real protocol readout. Design by Praveen Kumar, rebuilt by @forkthis_ai.",
@@ -22,7 +24,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <PublikGate appName="Midstance">{children}</PublikGate>
+      </body>
     </html>
   );
 }

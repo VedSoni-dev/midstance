@@ -14,6 +14,16 @@
   --pw: min(31.7vw, calc((100svh - 150px) / 1.575));
   --gap: calc(var(--pw) * 0.185);
   color-scheme: light;
+  /* the Sign in with publik gate, in Midstance's colours */
+  --publik-bg: var(--ground);
+  --publik-card: #ffffff;
+  --publik-ink: var(--ink);
+  --publik-muted: var(--muted);
+  --publik-line: var(--line);
+  --publik-accent: #0b0b0c;
+  --publik-accent-ink: #ffffff;
+  --publik-hover: #e4e8eb;
+  --publik-display-font: var(--serif);
 }
 
 * {
