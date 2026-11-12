@@ -5,7 +5,10 @@ import { Backdrop } from "./Backdrop";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { TelemetryPanel } from "./TelemetryPanel";
 import { Mark } from "./Mark";
-import { PublikNote, LISTING_URL } from "./PublikNote";
+import { PublikPitch } from "./PublikGate";
+import { SAMPLE, SessionScope } from "@/lib/session";
+
+const LISTING_URL = "https://publikhq.com/midstance";
 
 const REPO = "https://github.com/VedSoni-dev/midstance";
 const FILM = "https://vedsoni-dev.github.io/midstance/";
@@ -87,9 +90,11 @@ export function Landing() {
               .
             </p>
           </div>
-          <div className="lp-stage" aria-label="The real Midstance interface, running live">
-            <DiagnosticsPanel titleAs="h2" onOpen={() => window.location.assign("/app#protocol")} />
-            <TelemetryPanel />
+          <div className="lp-stage" aria-label="The real Midstance interface, running live on a sample session">
+            <SessionScope session={SAMPLE} live>
+              <DiagnosticsPanel titleAs="h2" onOpen={() => window.location.assign("/app")} />
+              <TelemetryPanel />
+            </SessionScope>
           </div>
         </section>
 
@@ -109,8 +114,13 @@ export function Landing() {
           </ol>
         </section>
 
-        <section className="lp-publik" aria-label="Midstance on publik">
-          <PublikNote className="lp-publik-note" />
+        <section className="lp-publik" aria-labelledby="lp-free">
+          <div>
+            <h2 id="lp-free" className="lp-h2">
+              Free, because of publik
+            </h2>
+            <PublikPitch appName="Midstance" className="lp-publik-note" />
+          </div>
           <a className="lp-btn" href="/app">
             Open the app <span aria-hidden>→</span>
           </a>

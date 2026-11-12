@@ -1,74 +1,94 @@
 "use client";
-// "View Protocol": a gait-assessment readout built from the session's numbers at the moment it opens,
-// with a three-phase corrective plan. Copy it, download it, or print it.
+// "View Protocol": a gait-assessment readout built from the person's own session: their numbers, the
+// left/right symmetry, findings from plain rules of thumb, and a three-phase corrective plan aimed at the
+// side and the issue the numbers point to. Copy it, download it, or print it. Not medical advice.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { readingsAt, type Readings } from "@/lib/readings";
-import { now } from "@/lib/clock";
-
-const SESSION = "0412";
+import { fmtPace, metrics, type Session } from "@/lib/session";
 
 type Phase = { n: string; name: string; weeks: string; items: [string, string][] };
+type Bar = { label: string; unit: string; l: number; r: number; si: number; max: number; dec: number };
 
-function build(r: Readings) {
-  const si = (l: number, rr: number) => (Math.abs(rr - l) / ((rr + l) / 2)) * 100;
-  const contactSI = si(r.contactL, r.contactR);
-  const loadSI = si(r.peakL, r.peakR);
-  const dropSI = si(r.pelvicDropL, r.pelvicDropR);
-  const heavier = r.peakR >= r.peakL ? "Right" : "Left";
-  const targetCadence = Math.round(r.cadence * 1.035);
-  const metrics: [string, string][] = [
-    ["Gait asymmetry", `${Math.round(r.asym)}°`],
-    ["Cadence", `${Math.round(r.cadence)} spm`],
-    ["Stride length", `${r.strideLength.toFixed(2)} m`],
-    ["Vertical oscillation", `${r.verticalOsc.toFixed(1)} cm`],
+export function buildProtocol(s: Session) {
+  const m = metrics(s);
+  const loadR = m.loadR;
+  const heavy = loadR > s.loadL ? "right" : "left";
+  const light = heavy === "right" ? "left" : "right";
+  const dropSide = s.pelvicDropR >= s.pelvicDropL ? "right" : "left";
+  const dropMax = Math.max(s.pelvicDropL, s.pelvicDropR);
+  const longContact = s.contactR >= s.contactL ? "right" : "left";
+  const lowKnee = s.kneeR <= s.kneeL ? "right" : "left";
+  const cueCadence = Math.min(185, Math.round(s.cadence * (s.cadence < 165 ? 1.05 : 1.03)));
+
+  const metricsRow: [string, string][] = [
+    ["Gait asymmetry", `${m.asym.toFixed(1)}%`],
+    ["Cadence", `${Math.round(s.cadence)} spm`],
+    ["Pace", `${fmtPace(m.paceSec)}`],
+    ["Vertical oscillation", `${s.verticalOsc.toFixed(1)} cm`],
   ];
-  const bars = [
-    { label: "Ground contact", unit: "ms", l: r.contactL, r: r.contactR, si: contactSI, max: 320 },
-    { label: "Peak plantar load", unit: "kPa", l: r.peakL, r: r.peakR, si: loadSI, max: 420 },
-    { label: "Pelvic drop", unit: "°", l: r.pelvicDropL, r: r.pelvicDropR, si: dropSI, max: 9 },
+  const bars: Bar[] = [
+    { label: "Load share", unit: "%", l: s.loadL, r: loadR, si: m.siLoad, max: 70, dec: 1 },
+    { label: "Ground contact", unit: "ms", l: s.contactL, r: s.contactR, si: m.siContact, max: 400, dec: 0 },
+    { label: "Peak knee flexion", unit: "°", l: s.kneeL, r: s.kneeR, si: m.siKnee, max: 140, dec: 0 },
+    { label: "Hip range of motion", unit: "°", l: s.hipL, r: s.hipR, si: m.siHip, max: 90, dec: 0 },
+    { label: "Pelvic drop", unit: "°", l: s.pelvicDropL, r: s.pelvicDropR, si: m.siDrop, max: 12, dec: 1 },
   ];
-  const findings = [
-    `${heavier} side loads ${Math.round(loadSI)}% harder and stays on the ground ${Math.round(Math.abs(r.contactR - r.contactL))} ms longer.`,
-    `Right pelvic drop of ${r.pelvicDropR.toFixed(1)}° (left ${r.pelvicDropL.toFixed(1)}°) points to under-active right hip abductors.`,
-    `Cadence of ${Math.round(r.cadence)} spm is fine; a ${targetCadence} spm cue shortens the overstride that feeds the asymmetry.`,
-  ];
+
+  // findings: plain rules of thumb, worst first
+  const findings: string[] = [];
+  const share = Math.abs(loadR - s.loadL) / 2;
+  if (share >= 1.5) findings.push(`The ${heavy} side carries ${Math.max(loadR, s.loadL).toFixed(1)}% of the load, ${share.toFixed(1)} points over an even split.`);
+  if (m.siContact >= 3) findings.push(`The ${longContact} foot stays on the ground ${Math.round(Math.abs(s.contactR - s.contactL))} ms longer (symmetry index ${m.siContact.toFixed(1)}%).`);
+  if (dropMax >= 6) findings.push(`${dropSide === "right" ? "Right" : "Left"}-leg stance lets the pelvis drop ${dropMax.toFixed(1)}°: the ${dropSide} hip abductors are the usual suspect.`);
+  else if (m.siDrop >= 25 && dropMax >= 4.5) findings.push(`Pelvic drop is uneven (${s.pelvicDropL.toFixed(1)}° left, ${s.pelvicDropR.toFixed(1)}° right).`);
+  if (m.siKnee >= 6) findings.push(`The ${lowKnee} knee folds ${Math.round(Math.abs(s.kneeR - s.kneeL))}° less in swing: a shorter heel recovery on that side.`);
+  if (m.siHip >= 8) findings.push(`Hip range differs by ${Math.round(Math.abs(s.hipR - s.hipL))}° (${Math.round(s.hipL)}° left, ${Math.round(s.hipR)}° right).`);
+  if (s.cadence < 165) findings.push(`Cadence of ${Math.round(s.cadence)} spm with ${s.strideLength.toFixed(2)} m strides suggests overstriding; a ${cueCadence} spm cue shortens it.`);
+  if (s.verticalOsc > 10) findings.push(`${s.verticalOsc.toFixed(1)} cm of vertical oscillation: energy going up instead of forward.`);
+  if (!findings.length) findings.push("Every left/right difference is inside the usual range. Keep doing what you're doing; the plan below is maintenance.");
+
+  const asymmetric = share >= 1.5 || m.siContact >= 3 || dropMax >= 6 || m.siKnee >= 6;
+  const target = dropMax >= 6 ? dropSide : asymmetric ? light : "both";
+  const T = target === "both" ? "each side" : target;
   const phases: Phase[] = [
     {
       n: "01", name: "Isolate", weeks: "Weeks 1–2",
       items: [
-        ["Side-lying hip abduction", "3 × 15 right · 2 × 15 left"],
-        ["Single-leg glute bridge", "3 × 12 each, right first"],
-        ["Banded lateral walk", "3 × 12 m each way"],
+        ["Side-lying hip abduction", target === "both" ? "3 × 15 each" : `3 × 15 ${T} · 2 × 15 other`],
+        ["Single-leg glute bridge", target === "both" ? "3 × 12 each" : `3 × 12 each, ${T} first`],
+        [m.siKnee >= 6 ? "Prone hamstring curl, banded" : "Banded lateral walk", m.siKnee >= 6 ? `3 × 12 ${lowKnee}` : "3 × 12 m each way"],
       ],
     },
     {
       n: "02", name: "Load", weeks: "Weeks 3–4",
       items: [
         ["Rear-foot-elevated split squat", "3 × 8 each, 3-1-1 tempo"],
-        ["Single-leg Romanian deadlift", "3 × 8 each"],
-        ["Eccentric step-down, 20 cm box", "3 × 10 right"],
+        ["Single-leg Romanian deadlift", target === "both" ? "3 × 8 each" : `3 × 8 each, +1 set ${T}`],
+        ["Eccentric step-down, 20 cm box", target === "both" ? "3 × 10 each" : `3 × 10 ${T}`],
       ],
     },
     {
       n: "03", name: "Re-pattern", weeks: "Weeks 5–6",
       items: [
         ["A-skips", "4 × 20 m"],
-        [`Metronome run at ${targetCadence} spm`, "6 × 1 min, 1 min easy"],
-        ["Hill strides", "6 × 15 s, walk back"],
+        [`Metronome run at ${cueCadence} spm`, "6 × 1 min, 1 min easy"],
+        [s.verticalOsc > 10 ? "Quiet-feet strides" : "Hill strides", "6 × 15 s, walk back"],
       ],
     },
   ];
-  const retest = `Retest in 14 days. Targets: asymmetry under 10°, right pelvic drop under 5°, contact-time difference under 3%.`;
-  return { metrics, bars, findings, phases, retest };
+  const retest = `Retest in 14 days and log it as a new session. Targets: load split within 48–52%, contact-time difference under 3%, pelvic drop under 5° on both sides${s.cadence < 165 ? `, cadence near ${cueCadence} spm` : ""}.`;
+  return { metrics: metricsRow, bars, findings, phases, retest };
 }
 
-function asText(r: Readings, p: ReturnType<typeof build>) {
+const unitOf = (b: Bar, v: number) => `${v.toFixed(b.dec)}${b.unit === "%" || b.unit === "°" ? b.unit : ` ${b.unit}`}`;
+
+function asText(s: Session, p: ReturnType<typeof buildProtocol>) {
   const lines = [
-    `MIDSTANCE · Corrective Gait Protocol · Session ${SESSION}`,
-    `(sample session data, not medical advice)`,
+    `MIDSTANCE · Corrective gait protocol · ${s.name} (${s.date})`,
+    `A visualisation of the numbers entered, not a medical device or medical advice.`,
     ``,
     ...p.metrics.map(([k, v]) => `${k}: ${v}`),
-    ...p.bars.map((b) => `${b.label}: L ${b.l.toFixed(b.unit === "°" ? 1 : 0)}${b.unit === "°" ? "°" : " " + b.unit} · R ${b.r.toFixed(b.unit === "°" ? 1 : 0)}${b.unit === "°" ? "°" : " " + b.unit} · symmetry index ${b.si.toFixed(1)}%`),
+    `Stride length: ${s.strideLength.toFixed(2)} m · speed ${(metrics(s).speed * 3.6).toFixed(1)} km/h`,
+    ...p.bars.map((b) => `${b.label}: L ${unitOf(b, b.l)} · R ${unitOf(b, b.r)} · symmetry index ${b.si.toFixed(1)}%`),
     ``,
     `Findings`,
     ...p.findings.map((f) => `- ${f}`),
@@ -76,24 +96,21 @@ function asText(r: Readings, p: ReturnType<typeof build>) {
     ...p.phases.flatMap((ph) => [`${ph.n} ${ph.name} (${ph.weeks})`, ...ph.items.map(([a, b]) => `  - ${a}: ${b}`)]),
     ``,
     p.retest,
+    ...(s.notes ? [``, `Notes: ${s.notes}`] : []),
   ];
-  void r;
   return lines.join("\n");
 }
 
-export function ProtocolSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function ProtocolSheet({ open, onClose, session }: { open: boolean; onClose: () => void; session: Session }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [r, setR] = useState<Readings>(() => readingsAt(now()));
   const [toast, setToast] = useState("");
-  const p = useMemo(() => build(r), [r]);
+  const p = useMemo(() => buildProtocol(session), [session]);
 
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (open && !d.open) {
-      setR(readingsAt(now()));
-      d.showModal();
-    } else if (!open && d.open) d.close();
+    if (open && !d.open) d.showModal();
+    else if (!open && d.open) d.close();
   }, [open]);
 
   useEffect(() => {
@@ -102,7 +119,7 @@ export function ProtocolSheet({ open, onClose }: { open: boolean; onClose: () =>
     return () => clearTimeout(id);
   }, [toast]);
 
-  const text = asText(r, p);
+  const text = asText(session, p);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text);
@@ -115,7 +132,7 @@ export function ProtocolSheet({ open, onClose }: { open: boolean; onClose: () =>
     const blob = new Blob([text + "\n"], { type: "text/plain" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `midstance-protocol-${SESSION}.txt`;
+    a.download = `midstance-protocol-${session.date}-${session.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "session"}.txt`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     setToast("Downloaded");
@@ -135,7 +152,7 @@ export function ProtocolSheet({ open, onClose }: { open: boolean; onClose: () =>
         <header className="sheet-head">
           <p className="diag-eyebrow sheet-eyebrow">
             <span className="dot-ring" aria-hidden />
-            Protocol / Session {SESSION}
+            Protocol / {session.name} · {session.date}
           </p>
           <button type="button" className="sheet-x" onClick={onClose} aria-label="Close protocol">
             ×
@@ -144,7 +161,7 @@ export function ProtocolSheet({ open, onClose }: { open: boolean; onClose: () =>
         <h2 id="sheet-title" className="sheet-title">
           Corrective Gait Protocol.
         </h2>
-        <p className="sheet-note">Built from this session&rsquo;s readout. Sample session data, not medical advice.</p>
+        <p className="sheet-note">Built from the numbers in this session. A visualisation of what you entered, not a medical device or medical advice.</p>
 
         <dl className="sheet-metrics">
           {p.metrics.map(([k, v]) => (
@@ -162,21 +179,19 @@ export function ProtocolSheet({ open, onClose }: { open: boolean; onClose: () =>
             <span role="columnheader">Right</span>
           </div>
           {p.bars.map((b) => {
-            const dec = b.unit === "°" ? 1 : 0;
-            const u = b.unit === "°" ? "°" : ` ${b.unit}`;
             return (
               <div key={b.label} className="bars-row" role="row">
-                <div className="bar bar-l" role="cell" aria-label={`Left ${b.l.toFixed(dec)}${u}`}>
-                  <span className="bar-v">{b.l.toFixed(dec)}{u}</span>
+                <div className="bar bar-l" role="cell" aria-label={`Left ${unitOf(b, b.l)}`}>
+                  <span className="bar-v">{unitOf(b, b.l)}</span>
                   <span className="bar-fill" style={{ width: `${(b.l / b.max) * 100}%` }} />
                 </div>
                 <div className="bars-mid" role="cell">
                   <span>{b.label}</span>
                   <span className="si">SI {b.si.toFixed(1)}%</span>
                 </div>
-                <div className="bar bar-r" role="cell" aria-label={`Right ${b.r.toFixed(dec)}${u}`}>
+                <div className="bar bar-r" role="cell" aria-label={`Right ${unitOf(b, b.r)}`}>
                   <span className="bar-fill" style={{ width: `${(b.r / b.max) * 100}%` }} />
-                  <span className="bar-v">{b.r.toFixed(dec)}{u}</span>
+                  <span className="bar-v">{unitOf(b, b.r)}</span>
                 </div>
               </div>
             );

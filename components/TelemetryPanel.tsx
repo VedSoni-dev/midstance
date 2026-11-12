@@ -4,7 +4,8 @@
 // hover a joint to read its angle.
 import { useEffect, useRef } from "react";
 import { subscribe, togglePaused, useClockState } from "@/lib/clock";
-import { CYCLE, pose, angles, type Pose, type Pt } from "@/lib/pose";
+import { pose, angles, type Pose, type Pt } from "@/lib/pose";
+import { gaitParams, phaseAt, SLOWMO, useLatest, useSessionView } from "@/lib/session";
 import { hash3 } from "@/lib/noise";
 
 const HIP = { x: 0.53, y: 0.535 }; // where the hip sits in the panel (fractions)
@@ -89,19 +90,16 @@ function drawRunner(ctx: CanvasRenderingContext2D, g: Geo, ps: Pose, dx: number,
 const TONE = { near: "#050b17", far: "#10213f", body: "#071122" };
 const GHOST = { near: "#b4d3f0", far: "#b4d3f0", body: "#a9cbec" };
 
-function phaseAt(t: number) {
-  return (((t / CYCLE) % 1) + 1) % 1;
-}
-
+// the near leg and arm are the runner's right side
 const JOINT_NAMES: Record<string, string> = {
   neck: "C7 · trunk lean",
-  nearHand: "Wrist · lead",
-  farHand: "Wrist · trail",
-  nearAnkle: "Ankle · lead",
-  farAnkle: "Ankle · trail",
-  nearKnee: "Knee · lead",
-  farKnee: "Knee · trail",
-  hip: "Pelvis",
+  nearHand: "Wrist R",
+  farHand: "Wrist L",
+  nearAnkle: "Ankle R",
+  farAnkle: "Ankle L",
+  nearKnee: "Knee R",
+  farKnee: "Knee L",
+  hip: "Hips L / R",
 };
 
 export function TelemetryPanel() {
@@ -112,6 +110,8 @@ export function TelemetryPanel() {
   const hudRef = useRef<HTMLCanvasElement>(null);
   const pointer = useRef<Pt | null>(null);
   const { paused, reduced } = useClockState();
+  const { session } = useSessionView();
+  const sref = useLatest(session);
 
   useEffect(() => {
     const host = wrap.current;
@@ -206,12 +206,15 @@ export function TelemetryPanel() {
     const draw = (t: number) => {
       lastT = t;
       const { w, h, U } = g;
+      const ses = sref.current;
+      const gp = gaitParams(ses);
       const ph = phaseAt(t);
 
       // --- fx: floor streaks, a contact shadow, and the trailing haze (half res, heavily blurred)
       fxc.setTransform(0.5, 0, 0, 0.5, 0, 0);
       fxc.clearRect(0, 0, w, h);
-      const speed = U * 1.9; // ground speed, px per second, matched to the stance foot
+      // ground speed from the session (stride length x cadence), at the runner's slowed-down playback
+      const speed = ((ses.strideLength * ses.cadence) / 60 / SLOWMO / 0.9) * U;
       for (let k = 0; k < 18; k++) {
         const y = h * (0.82 + hash3(k, 1, 0) * 0.17);
         const len = w * (0.12 + hash3(k, 2, 0) * 0.3);
@@ -220,7 +223,7 @@ export function TelemetryPanel() {
         fxc.fillStyle = `rgba(255,255,255,${0.18 + hash3(k, 5, 0) * 0.3})`;
         fxc.fillRect(x, y, len, 2 + hash3(k, 6, 0) * 4);
       }
-      const ps = pose(ph);
+      const ps = pose(ph, gp);
       const lowFoot = Math.max(P(g, ps.near.ankle).y, P(g, ps.far.ankle).y);
       fxc.fillStyle = "rgba(20,48,84,0.16)";
       fxc.beginPath();
@@ -228,7 +231,7 @@ export function TelemetryPanel() {
       fxc.fill();
       for (let k = 1; k <= 5; k++) {
         fxc.globalAlpha = 0.55 - k * 0.08;
-        drawRunner(fxc, g, pose(phaseAt(t - k * 0.05)), -k * U * 0.13, GHOST);
+        drawRunner(fxc, g, pose(phaseAt(t - k * 0.05), gp), -k * U * 0.13, GHOST);
       }
       fxc.globalAlpha = 1;
 
@@ -242,7 +245,7 @@ export function TelemetryPanel() {
       for (let k = 0; k < N; k++) {
         sc.clearRect(0, 0, w, h);
         const tt = t - spread * (k / (N - 1));
-        drawRunner(sc, g, pose(phaseAt(tt)), -(k / (N - 1)) * U * 0.05, TONE);
+        drawRunner(sc, g, pose(phaseAt(tt), gp), -(k / (N - 1)) * U * 0.05, TONE);
         fc.drawImage(sample, 0, 0);
       }
       fc.globalAlpha = 1;
@@ -316,6 +319,14 @@ export function TelemetryPanel() {
       hc.fillRect(w * 0.036, j.hip.y - 0.75 * lw, w * 0.05, 1.5 * lw);
       const lead = j.nearAnkle.x > j.farAnkle.x ? j.nearAnkle : j.farAnkle;
       hc.fillRect(lead.x - 0.75 * lw, h * 0.902, 1.5 * lw, h * 0.03);
+      // the session's numbers along the rulers (skipped when the panel is too small to read them)
+      if (w >= 320) {
+      hc.font = `${Math.round(8.5 * lw)}px ui-monospace, "Geist Mono", monospace`;
+      hc.fillStyle = "rgba(205,232,255,0.82)";
+      hc.textBaseline = "alphabetic";
+      hc.fillText(`VO ${ses.verticalOsc.toFixed(1)} CM`, w * 0.1, j.hip.y + 3 * lw);
+      hc.fillText(`${Math.round(ses.cadence)} SPM · STRIDE ${ses.strideLength.toFixed(2)} M · 1/${SLOWMO} SPEED`, w * 0.11, h * 0.885);
+      }
 
       // hover: the nearest joint's reading
       const pt = pointer.current;
@@ -331,13 +342,13 @@ export function TelemetryPanel() {
           }
         }
         if (best) {
-          const a = angles(ph);
+          const a = angles(ph, gp);
           const [k, p] = best;
           const val =
-            k === "nearKnee" || k === "nearAnkle" ? `${a.nearKnee}° flex` :
-            k === "farKnee" || k === "farAnkle" ? `${a.farKnee}° flex` :
+            k === "nearKnee" || k === "nearAnkle" ? `${a.nearKnee}° · peak ${Math.round(ses.kneeR)}°` :
+            k === "farKnee" || k === "farAnkle" ? `${a.farKnee}° · peak ${Math.round(ses.kneeL)}°` :
             k === "neck" ? `${Math.round(14 + 1.7 * Math.cos(4 * Math.PI * (ph - 0.2)))}°` :
-            k === "hip" ? `${a.nearHip}° / ${a.farHip}°` :
+            k === "hip" ? `ROM ${Math.round(ses.hipL)}° / ${Math.round(ses.hipR)}°` :
             k === "nearHand" ? `${-a.nearHip}° swing` : `${-a.farHip}° swing`;
           const label = `${JOINT_NAMES[k]}  ${val}`;
           hc.font = `${Math.round(10 * lw)}px ui-monospace, "Geist Mono", monospace`;

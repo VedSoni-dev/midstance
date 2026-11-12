@@ -3,6 +3,7 @@ import { useMemo, useRef } from "react";
 import { useHalftone, rgba } from "@/lib/halftone";
 import { hash3, smooth } from "@/lib/noise";
 import { useReadings, fmt, type Readings } from "@/lib/readings";
+import { useSessionView } from "@/lib/session";
 import { Heatmap } from "./Heatmap";
 
 const DOT = rgba("#cfd4d8");
@@ -38,9 +39,9 @@ function Texture() {
 
 function readoutText(r: Readings) {
   const lines = [
-    `Isolating Gait Asymmetry ${fmt.deg0(r.asym)}`,
-    `Sampling Ground Contact ${Math.round(r.contactR)} ms`,
-    `Resolving Pelvic Drop ${fmt.deg1(r.pelvicDropR)}`,
+    `Isolating Gait Asymmetry ${fmt.pct1(r.asym)}`,
+    `Sampling Ground Contact ${Math.round(r.v.contactL)}/${Math.round(r.v.contactR)} ms`,
+    `Resolving Pelvic Drop ${fmt.deg1(r.v.pelvicDropL)}/${fmt.deg1(r.v.pelvicDropR)}`,
   ];
   const span = 7; // seconds per line
   const k = Math.floor(r.t / span);
@@ -52,7 +53,8 @@ function readoutText(r: Readings) {
 
 export function DiagnosticsPanel({ onOpen, titleAs = "h1" }: { onOpen: () => void; titleAs?: "h1" | "h2" }) {
   const Title = titleAs;
-  const r = useReadings(15);
+  const { session, live } = useSessionView();
+  const r = useReadings(session, live, 15);
   const ro = useMemo(() => readoutText(r), [r]);
 
   return (
