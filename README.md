@@ -1,5 +1,7 @@
 # Midstance
 
+> **Live at [frontend.vedantsoni.com/gait](https://frontend.vedantsoni.com/gait)**, one piece of [fork this frontend](https://github.com/VedSoni-dev/frontend): every fork this front-end build on one site, free with a publik account. This repo keeps the original standalone version.
+
 ![midstance: your running numbers, drawn as a live gait map and protocol](docs/media/cover.png)
 
 A gait-assessment workspace with a designer's look: enter a running session's numbers (load split, cadence, stride, contact time, knee and hip angles, pelvic drop) and Midstance draws them as a live halftone load map and a motion-capture runner, then turns them into a corrective protocol.
@@ -19,7 +21,7 @@ Midstance visualises the numbers you enter. It is not a medical device and gives
 
 Screenshots are from the real app with sample numbers (the "Guarding the left" preset, named "Tuesday treadmill"); the GIF is cut from the launch film, which was captured frame by frame from the running app.
 
-**Links:** [publik listing](https://publikhq.com/midstance) · [live app](https://midstance.vercel.app) · [landing page & film](https://vedsoni-dev.github.io/midstance/)
+**Links:** [publik listing](https://publikhq.com/midstance) · [live app](https://frontend.vedantsoni.com/gait) · [landing page & film](https://vedsoni-dev.github.io/midstance/)
 
 ## What works
 
